@@ -1,0 +1,72 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: traefik-ingress-controller
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: traefik
+  labels:
+    app: traefik
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: traefik
+  template:
+    metadata:
+      labels:
+        app: traefik
+    spec:
+      serviceAccountName: traefik-ingress-controller
+      containers:
+        - name: traefik
+          image: traefik:v2.8
+          args:
+            - --log.level=INFO                      # [增加] Traefik的日志级别
+            - --api                                 # [增加] 允许访问API接口
+            - --api.insecure                        # [增加] 允许以HTTP访问API接口
+            - --entrypoints.web.address=:80
+            - --entrypoints.websecure.Address=:443  # [增加] 定义HTTPS的接收端口
+            - --providers.kubernetesingress
+          ports:
+            - name: web
+              containerPort: 80
+              hostPort: 80            # [增加] 暴露Traefik容器的80端口至节点[HTTP转发]
+            - name: websecure         # [增加] 增加HTTPS转发的支持[选用]
+              containerPort: 443      # [增加] Traefik容器上使用的端口[对应上面的配置][选用]
+              hostPort: 443           # [增加] 暴露Traefik容器的443端口至节点[HTTPS转发]
+            - name: admin             # [增加] 实际上加不加也可以
+              containerPort: 8080     # [增加] 这是Traefik的DashBoard访问端口
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: traefik
+spec:
+  selector:
+    app: traefik
+  ports:
+    - protocol: TCP
+      port: 8080
+      name: traefik
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: traefik
+spec:
+  rules:
+    - host: traefik.domain.ingress  # 域名定义
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: traefik
+                port:
+                  number: 8080

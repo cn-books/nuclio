@@ -1,0 +1,37 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    meta.helm.sh/release-name: nuclio
+    meta.helm.sh/release-namespace: default
+  creationTimestamp: "2022-06-23T03:02:34Z"
+  generation: 1
+  labels:
+    app: nuclio
+    app.kubernetes.io/managed-by: Helm
+    release: nuclio
+  name: nuclioapigateways.nuclio.io
+  resourceVersion: "1713664"
+  uid: 61749a33-79c7-42f7-ae79-bc3f200a38fc
+spec:
+  conversion:
+    strategy: None
+  group: nuclio.io
+  names:
+    kind: NuclioAPIGateway
+    listKind: NuclioAPIGatewayList
+    plural: nuclioapigateways
+    singular: nuclioapigateway
+  scope: Namespaced
+  versions:
+    - name: v1beta1
+      schema:
+        openAPIV3Schema:
+          properties:
+            spec:
+              x-kubernetes-preserve-unknown-fields: true
+            status:
+              x-kubernetes-preserve-unknown-fields: true
+          type: object
+      served: true
+      storage: true

@@ -1,0 +1,9 @@
+<view class="camera-box">
+  <camera device-position="front" flash="off" binderror="error" class="camera"></camera>
+  <view class="face-box">
+    <button class="face" type="primary" bindtap="takePhotoFaceCheck"> 人脸识别 </button>
+    <button class="face" type="default" bindtap="takePhoto"> 人脸录入 </button>
+    <button class="face" type="primary" bindtap="takePhotoFaceSearch"> 人脸搜索 </button>
+  
+  </view>
+</view>
